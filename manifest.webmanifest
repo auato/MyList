@@ -1,0 +1,19 @@
+{
+  "name": "MyList",
+  "short_name": "MyList",
+  "description": "Liste della spesa e cose da fare, offline",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#d8cfbd",
+  "theme_color": "#fff6a8",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22%3E%3Crect width=%22192%22 height=%22192%22 rx=%2228%22 fill=%22%23fff6a8%22/%3E%3Ctext x=%2296%22 y=%22132%22 font-family=%22Courier New, monospace%22 font-size=%22120%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%231a1a1a%22%3EM%3C/text%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

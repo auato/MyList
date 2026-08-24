@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MyList</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#fff6a8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MyList">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22%3E%3Crect width=%22192%22 height=%22192%22 rx=%2228%22 fill=%22%23fff6a8%22/%3E%3Ctext x=%2296%22 y=%22132%22 font-family=%22Courier New, monospace%22 font-size=%22120%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%231a1a1a%22%3EM%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --spazio-safe-top: env(safe-area-inset-top, 0px);
+    --spazio-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --spazio-safe-left: env(safe-area-inset-left, 0px);
+    --spazio-safe-right: env(safe-area-inset-right, 0px);
+    --colore-sfondo: #f4f4f4;
+    --colore-testo: #1a1a1a;
+    --colore-attenuato: #8a8a8a;
+    --colore-accento: #2f6fed;
+    --colore-pericolo: #d64545;
+    --colore-bordo: #ddd;
+    --colore-superficie: #ffffff;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    background: repeating-linear-gradient(45deg, #d8cfbd, #d8cfbd 12px, #ccc2ac 12px, #ccc2ac 24px);
+    color: var(--colore-testo);
+    font-family: "Courier New", Courier, monospace;
+    font-size: 16px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: calc(var(--spazio-safe-top) + 20px) calc(var(--spazio-safe-right) + 14px) calc(var(--spazio-safe-bottom) + 20px) calc(var(--spazio-safe-left) + 14px);
+  }
+
+  .schermata {
+    width: 100%;
+    max-width: 420px;
+    align-self: flex-start;
+    min-height: calc(100vh - 40px);
+    background: #fff6a8;
+    border-radius: 3px;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28), 0 2px 4px rgba(0, 0, 0, 0.18);
+    padding: 16px;
+    position: relative;
+  }
+
+  #schermata-elenco {
+    transform: rotate(-1deg);
+  }
+
+  #schermata-dettaglio {
+    transform: rotate(0.7deg);
+  }
+
+  .schermata::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 26px;
+    height: 26px;
+    background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.12) 60%, #fdf291 60%);
+    border-bottom-right-radius: 3px;
+  }
+
+  .nascosta {
+    display: none !important;
+  }
+
+  .intestazione {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .intestazione h1 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .pulsante {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 10px;
+    background: var(--colore-accento);
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .pulsante-icona {
+    min-height: 44px;
+    min-width: 44px;
+    border: none;
+    border-radius: 10px;
+    background: var(--colore-accento);
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .pulsante-pericolo {
+    background: var(--colore-pericolo);
+  }
+
+  .pulsante-secondario {
+    background: var(--colore-superficie);
+    color: var(--colore-testo);
+    border: 1px solid var(--colore-bordo);
+  }
+
+  .azioni-intestazione {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pulsante-icona-piccolo {
+    min-height: 40px;
+    min-width: 40px;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 8px;
+    background: var(--colore-superficie);
+    color: var(--colore-testo);
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .banner-messaggio {
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #fde2e2;
+    color: #7a1f1f;
+    border: 1px solid #f3b4b4;
+  }
+
+  .banner-messaggio.successo {
+    background: #e1f5e1;
+    color: #1f5c1f;
+    border-color: #b7dfb7;
+  }
+
+  .contenitore-ricerca {
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .contenitore-ricerca .icona-lente {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--colore-attenuato);
+    pointer-events: none;
+  }
+
+  .campo-ricerca {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 12px 0 34px;
+    font-size: 16px;
+    font-family: inherit;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 8px;
+    background: var(--colore-superficie);
+  }
+
+  .elenco-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .riga-lista {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 10px;
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .riga-lista .titolo-riga {
+    font-size: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .riga-lista .contatore-riga {
+    flex-shrink: 0;
+    color: var(--colore-attenuato);
+    font-size: 14px;
+  }
+
+  .vuoto {
+    color: var(--colore-attenuato);
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .intestazione-titolo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .etichetta-nota {
+    font-size: 18px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .giorno-settimana {
+    font-size: 18px;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .campo-titolo {
+    flex: 1;
+    min-width: 0;
+    min-height: 40px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: inherit;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 6px 8px;
+    background: transparent;
+  }
+
+  .campo-titolo:focus {
+    border-color: var(--colore-bordo);
+    background: var(--colore-superficie);
+  }
+
+  .elenco-voci {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .riga-voce {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 6px 10px;
+    background: var(--colore-superficie);
+    border: 1px solid var(--colore-bordo);
+    border-radius: 10px;
+  }
+
+  .riga-voce input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .riga-voce .testo-voce {
+    flex: 1;
+    font-size: 16px;
+    font-weight: bold;
+    word-break: break-word;
+  }
+
+  .riga-voce.fatta .testo-voce {
+    font-weight: normal;
+    text-decoration: line-through;
+    color: var(--colore-attenuato);
+  }
+
+  .riga-voce .elimina-voce {
+    flex-shrink: 0;
+    min-height: 40px;
+    min-width: 36px;
+    border: none;
+    background: transparent;
+    color: var(--colore-pericolo);
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .maniglia-trascina {
+    display: flex;
+    flex-shrink: 0;
+    min-height: 40px;
+    min-width: 32px;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--colore-attenuato);
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+  }
+
+  .riga-voce {
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+
+  .riga-voce.in-trascinamento {
+    opacity: 0.9;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    position: relative;
+    z-index: 5;
+    transition: box-shadow 150ms ease;
+  }
+
+  .riga-voce.in-trascinamento .maniglia-trascina {
+    cursor: grabbing;
+  }
+
+  .barra-nuova-voce {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .campo-nuova-voce {
+    flex: 1;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 16px;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 10px;
+    background: var(--colore-superficie);
+  }
+
+  .barra-azioni-dettaglio {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div id="schermata-elenco" class="schermata">
+  <div class="intestazione">
+    <h1>MyList</h1>
+    <div class="azioni-intestazione">
+      <button id="pulsante-esporta" class="pulsante-icona-piccolo" title="Esporta backup">&#8681;</button>
+      <button id="pulsante-importa" class="pulsante-icona-piccolo" title="Importa backup">&#8679;</button>
+      <button id="pulsante-nuova-lista" class="pulsante-icona" title="Nuova lista">+</button>
+    </div>
+  </div>
+  <input id="input-importa-file" type="file" accept="application/json" class="nascosta">
+  <div id="banner-messaggio" class="banner-messaggio nascosta"></div>
+  <div class="contenitore-ricerca">
+    <svg class="icona-lente" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"></circle>
+      <line x1="15.3" y1="15.3" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></line>
+    </svg>
+    <input id="campo-ricerca" class="campo-ricerca" type="text" placeholder="Cerca per titolo">
+  </div>
+  <div id="elenco-liste" class="elenco-liste"></div>
+</div>
+
+<div id="schermata-dettaglio" class="schermata nascosta">
+  <div class="intestazione">
+    <button id="pulsante-torna-elenco" class="pulsante-secondario pulsante">&larr; Liste</button>
+  </div>
+  <div class="intestazione-titolo">
+    <span class="etichetta-nota">Nota:</span>
+    <span id="giorno-settimana" class="giorno-settimana"></span>
+    <input id="campo-titolo" class="campo-titolo" type="text">
+  </div>
+  <div id="elenco-voci" class="elenco-voci"></div>
+  <div class="barra-nuova-voce">
+    <input id="campo-nuova-voce" class="campo-nuova-voce" type="text" placeholder="Nuova voce">
+  </div>
+  <div class="barra-azioni-dettaglio">
+    <button id="pulsante-elimina-lista" class="pulsante pulsante-pericolo">Elimina lista</button>
+  </div>
+</div>
+
+<script>
+
+  let liste = [];
+  let listaApertaId = null;
+  let testoRicerca = "";
+  let dbPromise = null;
+
+  function apriDatabase() {
+    return new Promise((risolvi, rifiuta) => {
+      const richiesta = indexedDB.open("mylist", 1);
+      richiesta.onupgradeneeded = () => {
+        const db = richiesta.result;
+        if (!db.objectStoreNames.contains("liste")) {
+          const store = db.createObjectStore("liste", { keyPath: "id" });
+          store.createIndex("per_data", "data");
+        }
+      };
+      richiesta.onsuccess = () => risolvi(richiesta.result);
+      richiesta.onerror = () => rifiuta(richiesta.error);
+    });
+  }
+
+  function ottieniDatabase() {
+    if (!dbPromise) dbPromise = apriDatabase();
+    return dbPromise;
+  }
+
+  async function ottieniTutteLeListeDalDB() {
+    const db = await ottieniDatabase();
+    return new Promise((risolvi, rifiuta) => {
+      const richiesta = db.transaction("liste", "readonly").objectStore("liste").getAll();
+      richiesta.onsuccess = () => risolvi(richiesta.result);
+      richiesta.onerror = () => rifiuta(richiesta.error);
+    });
+  }
+
+  async function salvaListaNelDB(lista) {
+    const db = await ottieniDatabase();
+    return new Promise((risolvi, rifiuta) => {
+      const transazione = db.transaction("liste", "readwrite");
+      transazione.objectStore("liste").put(lista);
+      transazione.oncomplete = () => risolvi();
+      transazione.onerror = () => rifiuta(transazione.error);
+    });
+  }
+
+  async function sostituisciArchivioNelDB(listeImportate) {
+    const db = await ottieniDatabase();
+    return new Promise((risolvi, rifiuta) => {
+      const transazione = db.transaction("liste", "readwrite");
+      const store = transazione.objectStore("liste");
+      store.clear();
+      listeImportate.forEach(lista => store.put(lista));
+      transazione.oncomplete = () => risolvi();
+      transazione.onerror = () => rifiuta(transazione.error);
+    });
+  }
+
+  async function salva(lista) {
+    try {
+      await salvaListaNelDB(lista);
+    } catch (errore) {
+      mostraMessaggio("Salvataggio non riuscito: la lista resta visibile ma potrebbe non essere conservata sul dispositivo.", "errore");
+    }
+  }
+
+  function generaId() {
+    return Date.now() + "-" + Math.random().toString(36).slice(2, 6);
+  }
+
+  function dataOggiISO() {
+    const oggi = new Date();
+    const anno = oggi.getFullYear();
+    const mese = String(oggi.getMonth() + 1).padStart(2, "0");
+    const giorno = String(oggi.getDate()).padStart(2, "0");
+    return `${anno}-${mese}-${giorno}`;
+  }
+
+  function formattaTitoloData(dataISO) {
+    const [anno, mese, giorno] = dataISO.split("-");
+    return `${giorno}-${mese}-${anno}`;
+  }
+
+  function adessoISO() {
+    return new Date().toISOString();
+  }
+
+  function calcolaProgressiviDuplicati(elencoListe) {
+    const gruppi = {};
+    elencoListe.forEach(lista => {
+      const chiave = lista.titolo.trim().toLowerCase();
+      if (!gruppi[chiave]) gruppi[chiave] = [];
+      gruppi[chiave].push(lista);
+    });
+
+    const progressivi = {};
+    Object.values(gruppi).forEach(gruppo => {
+      if (gruppo.length < 2) return;
+      const ordinatoPerCreazione = [...gruppo].sort((a, b) => a.creata.localeCompare(b.creata));
+      ordinatoPerCreazione.forEach((lista, indice) => {
+        progressivi[lista.id] = indice + 1;
+      });
+    });
+
+    return progressivi;
+  }
+
+  function estraiGiornoSettimana(titolo) {
+    const corrispondenza = titolo.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    if (!corrispondenza) return null;
+    const [, giorno, mese, anno] = corrispondenza;
+    const data = new Date(`${anno}-${mese}-${giorno}T00:00:00`);
+    if (isNaN(data.getTime())) return null;
+    const nomiGiorni = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+    return nomiGiorni[data.getDay()];
+  }
+
+  function ottieniTutteLeListeVisibili() {
+    return liste
+      .filter(lista => !lista.eliminata)
+      .sort((a, b) => {
+        if (a.data !== b.data) return b.data.localeCompare(a.data);
+        return b.creata.localeCompare(a.creata);
+      });
+  }
+
+  function ottieniListaPerId(id) {
+    return liste.find(lista => lista.id === id);
+  }
+
+  async function creaNuovaLista() {
+    const adesso = adessoISO();
+    const dataOggi = dataOggiISO();
+    const nuovaLista = {
+      id: generaId(),
+      data: dataOggi,
+      titolo: formattaTitoloData(dataOggi),
+      voci: [],
+      creata: adesso,
+      modificata: adesso,
+      eliminata: false
+    };
+    liste.push(nuovaLista);
+    await salva(nuovaLista);
+    return nuovaLista;
+  }
+
+  async function aggiornaTitoloLista(id, nuovoTitolo) {
+    const lista = ottieniListaPerId(id);
+    lista.titolo = nuovoTitolo.trim() === "" ? formattaTitoloData(lista.data) : nuovoTitolo.trim();
+    lista.modificata = adessoISO();
+    await salva(lista);
+  }
+
+  async function aggiungiVoce(listaId, testo) {
+    const lista = ottieniListaPerId(listaId);
+    lista.voci.push({ id: generaId(), testo: testo.trim(), fatto: false });
+    lista.modificata = adessoISO();
+    await salva(lista);
+  }
+
+  async function toggleVoce(listaId, voceId) {
+    const lista = ottieniListaPerId(listaId);
+    const voce = lista.voci.find(v => v.id === voceId);
+    voce.fatto = !voce.fatto;
+    lista.modificata = adessoISO();
+    await salva(lista);
+  }
+
+  async function eliminaVoce(listaId, voceId) {
+    const lista = ottieniListaPerId(listaId);
+    lista.voci = lista.voci.filter(v => v.id !== voceId);
+    lista.modificata = adessoISO();
+    await salva(lista);
+  }
+
+  async function riordinaVociSecondoId(listaId, ordineId) {
+    const lista = ottieniListaPerId(listaId);
+    lista.voci.sort((a, b) => ordineId.indexOf(a.id) - ordineId.indexOf(b.id));
+    lista.modificata = adessoISO();
+    await salva(lista);
+  }
+
+  async function eliminaListaLogica(id) {
+    const lista = ottieniListaPerId(id);
+    lista.eliminata = true;
+    lista.modificata = adessoISO();
+    await salva(lista);
+  }
+
+  function calcolaContatore(lista) {
+    const fatte = lista.voci.filter(v => v.fatto).length;
+    return `${fatte}/${lista.voci.length}`;
+  }
+
+  function filtraListePerRicerca(elencoListe, testo) {
+    const testoNormalizzato = testo.trim().toLowerCase();
+    if (testoNormalizzato === "") return elencoListe;
+    return elencoListe.filter(lista => lista.titolo.toLowerCase().includes(testoNormalizzato));
+  }
+
+  function creaRigaLista(lista, progressivo) {
+    const riga = document.createElement("div");
+    riga.className = "riga-lista";
+
+    const titolo = document.createElement("span");
+    titolo.className = "titolo-riga";
+    const giorno = estraiGiornoSettimana(lista.titolo);
+    const suffissoProgressivo = progressivo ? ` (${progressivo})` : "";
+    titolo.textContent = "Nota: " + (giorno ? giorno + " " : "") + lista.titolo + suffissoProgressivo;
+
+    const contatore = document.createElement("span");
+    contatore.className = "contatore-riga";
+    contatore.textContent = calcolaContatore(lista);
+
+    riga.appendChild(titolo);
+    riga.appendChild(contatore);
+    riga.addEventListener("click", () => gestisciAperturaLista(lista.id));
+
+    return riga;
+  }
+
+  function creaRigaVoce(lista, voce) {
+    const riga = document.createElement("div");
+    riga.className = "riga-voce" + (voce.fatto ? " fatta" : "");
+    riga.dataset.voceId = voce.id;
+
+    const casella = document.createElement("input");
+    casella.type = "checkbox";
+    casella.checked = voce.fatto;
+    casella.addEventListener("change", () => gestisciToggleVoce(lista.id, voce.id));
+
+    const testo = document.createElement("span");
+    testo.className = "testo-voce";
+    testo.textContent = voce.testo;
+
+    const maniglia = document.createElement("span");
+    maniglia.className = "maniglia-trascina";
+    maniglia.textContent = "⠿";
+    maniglia.addEventListener("pointerdown", evento => iniziaTrascinamento(evento, riga, lista.id));
+
+    const pulsanteElimina = document.createElement("button");
+    pulsanteElimina.className = "elimina-voce";
+    pulsanteElimina.textContent = "✕";
+    pulsanteElimina.title = "Elimina voce";
+    pulsanteElimina.addEventListener("click", () => gestisciEliminaVoce(lista.id, voce.id));
+
+    riga.appendChild(casella);
+    riga.appendChild(testo);
+    riga.appendChild(maniglia);
+    riga.appendChild(pulsanteElimina);
+
+    return riga;
+  }
+
+  function mostraSchermata(nome) {
+    document.getElementById("schermata-elenco").classList.toggle("nascosta", nome !== "elenco");
+    document.getElementById("schermata-dettaglio").classList.toggle("nascosta", nome !== "dettaglio");
+  }
+
+  function aggiornaVistaElenco() {
+    const contenitore = document.getElementById("elenco-liste");
+    contenitore.innerHTML = "";
+
+    const listeVisibili = filtraListePerRicerca(ottieniTutteLeListeVisibili(), testoRicerca);
+
+    if (listeVisibili.length === 0) {
+      const messaggioVuoto = document.createElement("p");
+      messaggioVuoto.className = "vuoto";
+      messaggioVuoto.textContent = "Nessuna lista trovata";
+      contenitore.appendChild(messaggioVuoto);
+      return;
+    }
+
+    const progressivi = calcolaProgressiviDuplicati(listeVisibili);
+    listeVisibili.forEach(lista => {
+      contenitore.appendChild(creaRigaLista(lista, progressivi[lista.id]));
+    });
+  }
+
+  function aggiornaVistaDettaglio() {
+    const lista = ottieniListaPerId(listaApertaId);
+
+    const campoTitolo = document.getElementById("campo-titolo");
+    campoTitolo.value = lista.titolo;
+
+    const giorno = estraiGiornoSettimana(lista.titolo);
+    document.getElementById("giorno-settimana").textContent = giorno ? giorno : "";
+
+    const contenitoreVoci = document.getElementById("elenco-voci");
+    contenitoreVoci.innerHTML = "";
+    lista.voci.forEach(voce => contenitoreVoci.appendChild(creaRigaVoce(lista, voce)));
+
+    document.getElementById("campo-nuova-voce").value = "";
+  }
+
+  async function gestisciNuovaLista() {
+    const nuovaLista = await creaNuovaLista();
+    listaApertaId = nuovaLista.id;
+    aggiornaVistaDettaglio();
+    mostraSchermata("dettaglio");
+  }
+
+  function gestisciAperturaLista(id) {
+    listaApertaId = id;
+    aggiornaVistaDettaglio();
+    mostraSchermata("dettaglio");
+  }
+
+  function gestisciRitornoElenco() {
+    listaApertaId = null;
+    aggiornaVistaElenco();
+    mostraSchermata("elenco");
+  }
+
+  async function gestisciModificaTitolo(evento) {
+    await aggiornaTitoloLista(listaApertaId, evento.target.value);
+    aggiornaVistaDettaglio();
+  }
+
+  async function gestisciToggleVoce(listaId, voceId) {
+    await toggleVoce(listaId, voceId);
+    aggiornaVistaDettaglio();
+  }
+
+  async function gestisciEliminaVoce(listaId, voceId) {
+    await eliminaVoce(listaId, voceId);
+    aggiornaVistaDettaglio();
+  }
+
+  let elementoTrascinato = null;
+  let listaIdTrascinata = null;
+  let yPuntatoreIniziale = 0;
+
+  function iniziaTrascinamento(evento, riga, listaId) {
+    elementoTrascinato = riga;
+    listaIdTrascinata = listaId;
+    yPuntatoreIniziale = evento.clientY;
+    riga.classList.add("in-trascinamento");
+    document.addEventListener("pointermove", spostaDuranteTrascinamento);
+    document.addEventListener("pointerup", terminaTrascinamento);
+    document.addEventListener("pointercancel", terminaTrascinamento);
+  }
+
+  function catturaPosizioniVerticali(contenitore) {
+    const posizioni = new Map();
+    Array.from(contenitore.children).forEach(elemento => {
+      posizioni.set(elemento, elemento.getBoundingClientRect().top);
+    });
+    return posizioni;
+  }
+
+  function animaSpostamentoSiblings(contenitore, posizioniPrima) {
+    Array.from(contenitore.children).forEach(elemento => {
+      if (elemento === elementoTrascinato) return;
+      const primaTop = posizioniPrima.get(elemento);
+      const dopoTop = elemento.getBoundingClientRect().top;
+      const delta = primaTop - dopoTop;
+      if (!delta) return;
+
+      elemento.style.transition = "none";
+      elemento.style.transform = `translateY(${delta}px)`;
+      requestAnimationFrame(() => {
+        elemento.style.transition = "";
+        elemento.style.transform = "";
+      });
+    });
+  }
+
+  function trovaVicinoDaScambiare(centroTrascinata) {
+    const successivo = elementoTrascinato.nextElementSibling;
+    if (successivo) {
+      const rect = successivo.getBoundingClientRect();
+      if (centroTrascinata > rect.top + rect.height / 2) {
+        return { elemento: successivo, dopo: true };
+      }
+    }
+
+    const precedente = elementoTrascinato.previousElementSibling;
+    if (precedente) {
+      const rect = precedente.getBoundingClientRect();
+      if (centroTrascinata < rect.top + rect.height / 2) {
+        return { elemento: precedente, dopo: false };
+      }
+    }
+
+    return null;
+  }
+
+  function spostaDuranteTrascinamento(evento) {
+    if (!elementoTrascinato) return;
+
+    elementoTrascinato.style.transform = `translateY(${evento.clientY - yPuntatoreIniziale}px)`;
+
+    const rettangoloTrascinata = elementoTrascinato.getBoundingClientRect();
+    const centroTrascinata = rettangoloTrascinata.top + rettangoloTrascinata.height / 2;
+    const vicino = trovaVicinoDaScambiare(centroTrascinata);
+    if (!vicino) return;
+
+    const contenitore = document.getElementById("elenco-voci");
+    const posizioniPrima = catturaPosizioniVerticali(contenitore);
+    const offsetTopPrima = elementoTrascinato.offsetTop;
+
+    if (vicino.dopo) {
+      contenitore.insertBefore(elementoTrascinato, vicino.elemento.nextSibling);
+    } else {
+      contenitore.insertBefore(elementoTrascinato, vicino.elemento);
+    }
+
+    yPuntatoreIniziale += elementoTrascinato.offsetTop - offsetTopPrima;
+    elementoTrascinato.style.transform = `translateY(${evento.clientY - yPuntatoreIniziale}px)`;
+    animaSpostamentoSiblings(contenitore, posizioniPrima);
+  }
+
+  function terminaTrascinamento() {
+    if (!elementoTrascinato) return;
+
+    elementoTrascinato.classList.remove("in-trascinamento");
+    elementoTrascinato.style.transform = "";
+    const contenitore = document.getElementById("elenco-voci");
+    const nuovoOrdineId = Array.from(contenitore.children).map(elemento => elemento.dataset.voceId);
+    riordinaVociSecondoId(listaIdTrascinata, nuovoOrdineId);
+
+    elementoTrascinato = null;
+    listaIdTrascinata = null;
+    document.removeEventListener("pointermove", spostaDuranteTrascinamento);
+    document.removeEventListener("pointerup", terminaTrascinamento);
+    document.removeEventListener("pointercancel", terminaTrascinamento);
+  }
+
+  async function gestisciAggiuntaVoce(evento) {
+    if (evento.key !== "Enter") return;
+    const testo = evento.target.value;
+    if (testo.trim() === "") return;
+    await aggiungiVoce(listaApertaId, testo);
+    aggiornaVistaDettaglio();
+    document.getElementById("campo-nuova-voce").focus();
+  }
+
+  async function gestisciEliminaLista() {
+    const conferma = confirm("Eliminare l'intera lista?");
+    if (!conferma) return;
+    await eliminaListaLogica(listaApertaId);
+    listaApertaId = null;
+    aggiornaVistaElenco();
+    mostraSchermata("elenco");
+  }
+
+  function gestisciRicerca(evento) {
+    testoRicerca = evento.target.value;
+    aggiornaVistaElenco();
+  }
+
+  function mostraMessaggio(testo, tipo) {
+    const banner = document.getElementById("banner-messaggio");
+    banner.textContent = testo;
+    banner.className = "banner-messaggio" + (tipo === "successo" ? " successo" : "");
+  }
+
+  function esportaArchivio() {
+    const contenuto = JSON.stringify(liste, null, 2);
+    const blob = new Blob([contenuto], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mylist-backup-${dataOggiISO()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function gestisciEsportazione() {
+    esportaArchivio();
+    mostraMessaggio("Backup esportato.", "successo");
+  }
+
+  function leggiFileComeTesto(file) {
+    return new Promise((risolvi, rifiuta) => {
+      const lettore = new FileReader();
+      lettore.onload = () => risolvi(lettore.result);
+      lettore.onerror = () => rifiuta(lettore.error);
+      lettore.readAsText(file);
+    });
+  }
+
+  function èArchivioValido(dati) {
+    return Array.isArray(dati) && dati.every(lista =>
+      typeof lista.id === "string" && typeof lista.titolo === "string" && Array.isArray(lista.voci)
+    );
+  }
+
+  async function gestisciImportazione(evento) {
+    const file = evento.target.files[0];
+    evento.target.value = "";
+    if (!file) return;
+
+    try {
+      const testo = await leggiFileComeTesto(file);
+      const dati = JSON.parse(testo);
+      if (!èArchivioValido(dati)) {
+        mostraMessaggio("Il file scelto non è un backup di MyList valido.", "errore");
+        return;
+      }
+
+      const conferma = confirm("Importare questo file sostituirà tutte le liste presenti sul dispositivo. Continuare?");
+      if (!conferma) return;
+
+      await sostituisciArchivioNelDB(dati);
+      liste = dati;
+      listaApertaId = null;
+      aggiornaVistaElenco();
+      mostraSchermata("elenco");
+      mostraMessaggio("Backup importato.", "successo");
+    } catch (errore) {
+      mostraMessaggio("Importazione non riuscita: il file potrebbe essere danneggiato.", "errore");
+    }
+  }
+
+  document.getElementById("pulsante-nuova-lista").addEventListener("click", gestisciNuovaLista);
+  document.getElementById("pulsante-torna-elenco").addEventListener("click", gestisciRitornoElenco);
+  document.getElementById("campo-titolo").addEventListener("change", gestisciModificaTitolo);
+  document.getElementById("campo-nuova-voce").addEventListener("keydown", gestisciAggiuntaVoce);
+  document.getElementById("pulsante-elimina-lista").addEventListener("click", gestisciEliminaLista);
+  document.getElementById("campo-ricerca").addEventListener("input", gestisciRicerca);
+  document.getElementById("pulsante-esporta").addEventListener("click", gestisciEsportazione);
+  document.getElementById("pulsante-importa").addEventListener("click", () => document.getElementById("input-importa-file").click());
+  document.getElementById("input-importa-file").addEventListener("change", gestisciImportazione);
+
+  async function avviaApp() {
+    try {
+      liste = await ottieniTutteLeListeDalDB();
+    } catch (errore) {
+      liste = [];
+      mostraMessaggio("Impossibile accedere al database locale: le liste create in questa sessione potrebbero non essere salvate.", "errore");
+    }
+    aggiornaVistaElenco();
+    mostraSchermata("elenco");
+  }
+
+  avviaApp();
+
+  function registraServiceWorker() {
+    if (!("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.register("./sw.js");
+  }
+
+  window.addEventListener("load", registraServiceWorker);
+
+</script>
+
+</body>
+</html>
