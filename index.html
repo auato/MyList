@@ -305,16 +305,9 @@
 
   .riga-voce .testo-voce {
     flex: 1;
-    min-width: 0;
     font-size: 16px;
     font-weight: bold;
-    color: var(--colore-testo);
     word-break: break-word;
-    outline: none;
-  }
-
-  .riga-voce .testo-voce[contenteditable="false"] {
-    cursor: default;
   }
 
   .riga-voce.fatta .testo-voce {
@@ -634,13 +627,6 @@
     await salva(lista);
   }
 
-  async function aggiornaTestoVoce(listaId, voceId, nuovoTesto) {
-    const lista = ottieniListaPerId(listaId);
-    const voce = lista.voci.find(v => v.id === voceId);
-    voce.testo = nuovoTesto;
-    lista.modificata = adessoISO();
-    await salva(lista);
-  }
 
   async function riordinaVociSecondoId(listaId, ordineId) {
     const lista = ottieniListaPerId(listaId);
@@ -706,15 +692,6 @@
     const testo = document.createElement("span");
     testo.className = "testo-voce";
     testo.textContent = voce.testo;
-    testo.contentEditable = voce.fatto ? "false" : "true";
-    testo.spellcheck = false;
-    testo.addEventListener("blur", () => gestisciModificaTestoVoce(lista.id, voce.id, testo));
-    testo.addEventListener("keydown", evento => {
-      if (evento.key === "Enter") {
-        evento.preventDefault();
-        testo.blur();
-      }
-    });
 
     const maniglia = document.createElement("span");
     maniglia.className = "maniglia-trascina";
@@ -817,15 +794,6 @@
     aggiornaVistaDettaglio();
   }
 
-  async function gestisciModificaTestoVoce(listaId, voceId, campo) {
-    const nuovoTesto = campo.textContent.trim();
-    if (nuovoTesto === "") {
-      aggiornaVistaDettaglio();
-      return;
-    }
-    await aggiornaTestoVoce(listaId, voceId, nuovoTesto);
-    aggiornaVistaDettaglio();
-  }
 
   let elementoTrascinato = null;
   let listaIdTrascinata = null;
