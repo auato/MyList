@@ -593,8 +593,10 @@
     const parole = testo.trim().toLowerCase().split(/\s+/).filter(parola => parola !== "");
     if (parole.length === 0) return elencoListe;
     return elencoListe.filter(lista => {
-      const titoloNormalizzato = lista.titolo.toLowerCase();
-      return parole.every(parola => titoloNormalizzato.includes(parola));
+      const testoDellaLista = [lista.titolo, ...lista.voci.map(voce => voce.testo)]
+        .join(" ")
+        .toLowerCase();
+      return parole.every(parola => testoDellaLista.includes(parola));
     });
   }
 
@@ -627,7 +629,7 @@
     const casella = document.createElement("input");
     casella.type = "checkbox";
     casella.checked = voce.fatto;
-    casella.addEventListener("change", () => gestisciToggleVoce(lista.id, voce.id));
+    casella.addEventListener("change", () => gestisciToggleVoce(lista.id, voce.id, voce.fatto, casella));
 
     const testo = document.createElement("span");
     testo.className = "testo-voce";
@@ -717,7 +719,14 @@
     aggiornaVistaDettaglio();
   }
 
-  async function gestisciToggleVoce(listaId, voceId) {
+  async function gestisciToggleVoce(listaId, voceId, eraFatta, casella) {
+    if (eraFatta) {
+      const conferma = confirm("Vuoi veramente riattivare questo punto?");
+      if (!conferma) {
+        casella.checked = true;
+        return;
+      }
+    }
     await toggleVoce(listaId, voceId);
     aggiornaVistaDettaglio();
   }
