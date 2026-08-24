@@ -305,9 +305,18 @@
 
   .riga-voce .testo-voce {
     flex: 1;
+    min-width: 0;
+    font-family: inherit;
     font-size: 16px;
     font-weight: bold;
-    word-break: break-word;
+    color: var(--colore-testo);
+    border: none;
+    background: transparent;
+    padding: 0;
+  }
+
+  .riga-voce .testo-voce[readonly] {
+    cursor: default;
   }
 
   .riga-voce.fatta .testo-voce {
@@ -627,6 +636,14 @@
     await salva(lista);
   }
 
+  async function aggiornaTestoVoce(listaId, voceId, nuovoTesto) {
+    const lista = ottieniListaPerId(listaId);
+    const voce = lista.voci.find(v => v.id === voceId);
+    voce.testo = nuovoTesto;
+    lista.modificata = adessoISO();
+    await salva(lista);
+  }
+
   async function riordinaVociSecondoId(listaId, ordineId) {
     const lista = ottieniListaPerId(listaId);
     lista.voci.sort((a, b) => ordineId.indexOf(a.id) - ordineId.indexOf(b.id));
@@ -688,9 +705,15 @@
     casella.checked = voce.fatto;
     casella.addEventListener("change", () => gestisciToggleVoce(lista.id, voce.id, voce.fatto, casella));
 
-    const testo = document.createElement("span");
+    const testo = document.createElement("input");
+    testo.type = "text";
     testo.className = "testo-voce";
-    testo.textContent = voce.testo;
+    testo.value = voce.testo;
+    testo.readOnly = voce.fatto;
+    testo.addEventListener("change", () => gestisciModificaTestoVoce(lista.id, voce.id, testo));
+    testo.addEventListener("keydown", evento => {
+      if (evento.key === "Enter") testo.blur();
+    });
 
     const maniglia = document.createElement("span");
     maniglia.className = "maniglia-trascina";
@@ -790,6 +813,16 @@
 
   async function gestisciEliminaVoce(listaId, voceId) {
     await eliminaVoce(listaId, voceId);
+    aggiornaVistaDettaglio();
+  }
+
+  async function gestisciModificaTestoVoce(listaId, voceId, campo) {
+    const nuovoTesto = campo.value.trim();
+    if (nuovoTesto === "") {
+      aggiornaVistaDettaglio();
+      return;
+    }
+    await aggiornaTestoVoce(listaId, voceId, nuovoTesto);
     aggiornaVistaDettaglio();
   }
 
