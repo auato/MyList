@@ -1,4 +1,4 @@
-const NOME_CACHE = "mylist-v11";
+const NOME_CACHE = "mylist-v12";
 const FILE_DA_METTERE_IN_CACHE = ["./", "./index.html", "./manifest.webmanifest"];
 
 self.addEventListener("install", evento => {

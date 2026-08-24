@@ -306,16 +306,14 @@
   .riga-voce .testo-voce {
     flex: 1;
     min-width: 0;
-    font-family: inherit;
     font-size: 16px;
     font-weight: bold;
     color: var(--colore-testo);
-    border: none;
-    background: transparent;
-    padding: 0;
+    word-break: break-word;
+    outline: none;
   }
 
-  .riga-voce .testo-voce[readonly] {
+  .riga-voce .testo-voce[contenteditable="false"] {
     cursor: default;
   }
 
@@ -705,14 +703,17 @@
     casella.checked = voce.fatto;
     casella.addEventListener("change", () => gestisciToggleVoce(lista.id, voce.id, voce.fatto, casella));
 
-    const testo = document.createElement("input");
-    testo.type = "text";
+    const testo = document.createElement("span");
     testo.className = "testo-voce";
-    testo.value = voce.testo;
-    testo.readOnly = voce.fatto;
-    testo.addEventListener("change", () => gestisciModificaTestoVoce(lista.id, voce.id, testo));
+    testo.textContent = voce.testo;
+    testo.contentEditable = voce.fatto ? "false" : "true";
+    testo.spellcheck = false;
+    testo.addEventListener("blur", () => gestisciModificaTestoVoce(lista.id, voce.id, testo));
     testo.addEventListener("keydown", evento => {
-      if (evento.key === "Enter") testo.blur();
+      if (evento.key === "Enter") {
+        evento.preventDefault();
+        testo.blur();
+      }
     });
 
     const maniglia = document.createElement("span");
@@ -817,7 +818,7 @@
   }
 
   async function gestisciModificaTestoVoce(listaId, voceId, campo) {
-    const nuovoTesto = campo.value.trim();
+    const nuovoTesto = campo.textContent.trim();
     if (nuovoTesto === "") {
       aggiornaVistaDettaglio();
       return;
