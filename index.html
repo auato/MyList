@@ -37,45 +37,20 @@
   }
 
   body {
-    background: repeating-linear-gradient(45deg, #d8cfbd, #d8cfbd 12px, #ccc2ac 12px, #ccc2ac 24px);
+    background: var(--colore-sfondo);
     color: var(--colore-testo);
     font-family: "Courier New", Courier, monospace;
     font-size: 16px;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    padding: calc(var(--spazio-safe-top) + 20px) calc(var(--spazio-safe-right) + 14px) calc(var(--spazio-safe-bottom) + 20px) calc(var(--spazio-safe-left) + 14px);
   }
 
   .schermata {
-    width: 100%;
+    min-height: 100vh;
     max-width: 420px;
-    align-self: flex-start;
-    min-height: calc(100vh - 40px);
-    background: #fff6a8;
-    border-radius: 3px;
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28), 0 2px 4px rgba(0, 0, 0, 0.18);
-    padding: 16px;
-    position: relative;
-  }
-
-  #schermata-elenco {
-    transform: rotate(-1deg);
-  }
-
-  #schermata-dettaglio {
-    transform: rotate(0.7deg);
-  }
-
-  .schermata::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 26px;
-    height: 26px;
-    background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.12) 50%, rgba(0, 0, 0, 0.12) 60%, #fdf291 60%);
-    border-bottom-right-radius: 3px;
+    margin: 0 auto;
+    padding-top: calc(var(--spazio-safe-top) + 10px);
+    padding-bottom: calc(var(--spazio-safe-bottom) + 10px);
+    padding-left: calc(var(--spazio-safe-left) + 10px);
+    padding-right: calc(var(--spazio-safe-right) + 10px);
   }
 
   .nascosta {
@@ -119,10 +94,6 @@
     cursor: pointer;
   }
 
-  .pulsante-pericolo {
-    background: var(--colore-pericolo);
-  }
-
   .pulsante-secondario {
     background: var(--colore-superficie);
     color: var(--colore-testo);
@@ -138,11 +109,25 @@
   .pulsante-icona-piccolo {
     min-height: 40px;
     min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid var(--colore-bordo);
     border-radius: 8px;
     background: var(--colore-superficie);
     color: var(--colore-testo);
-    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .pulsante-elimina-discreto {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--colore-attenuato);
     cursor: pointer;
   }
 
@@ -356,11 +341,6 @@
     background: var(--colore-superficie);
   }
 
-  .barra-azioni-dettaglio {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-  }
 </style>
 </head>
 <body>
@@ -369,8 +349,16 @@
   <div class="intestazione">
     <h1>MyList</h1>
     <div class="azioni-intestazione">
-      <button id="pulsante-esporta" class="pulsante-icona-piccolo" title="Esporta backup">&#8681;</button>
-      <button id="pulsante-importa" class="pulsante-icona-piccolo" title="Importa backup">&#8679;</button>
+      <button id="pulsante-esporta" class="pulsante-icona-piccolo" title="Esporta backup">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M12 4v10m0 0-4-4m4 4 4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
+      <button id="pulsante-importa" class="pulsante-icona-piccolo" title="Importa backup">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M12 20V10m0 0-4 4m4-4 4 4M5 5h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </button>
       <button id="pulsante-nuova-lista" class="pulsante-icona" title="Nuova lista">+</button>
     </div>
   </div>
@@ -381,7 +369,7 @@
       <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"></circle>
       <line x1="15.3" y1="15.3" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></line>
     </svg>
-    <input id="campo-ricerca" class="campo-ricerca" type="text" placeholder="Cerca per titolo">
+    <input id="campo-ricerca" class="campo-ricerca" type="text" placeholder="Cerca nelle note">
   </div>
   <div id="elenco-liste" class="elenco-liste"></div>
 </div>
@@ -389,6 +377,11 @@
 <div id="schermata-dettaglio" class="schermata nascosta">
   <div class="intestazione">
     <button id="pulsante-torna-elenco" class="pulsante-secondario pulsante">&larr; Liste</button>
+    <button id="pulsante-elimina-lista" class="pulsante-elimina-discreto" title="Elimina lista">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </button>
   </div>
   <div class="intestazione-titolo">
     <span class="etichetta-nota">Nota:</span>
@@ -396,12 +389,9 @@
     <input id="campo-titolo" class="campo-titolo" type="text">
   </div>
   <div id="elenco-voci" class="elenco-voci"></div>
-  <div class="barra-nuova-voce">
-    <input id="campo-nuova-voce" class="campo-nuova-voce" type="text" placeholder="Nuova voce">
-  </div>
-  <div class="barra-azioni-dettaglio">
-    <button id="pulsante-elimina-lista" class="pulsante pulsante-pericolo">Elimina lista</button>
-  </div>
+  <form id="form-nuova-voce" class="barra-nuova-voce">
+    <input id="campo-nuova-voce" class="campo-nuova-voce" type="text" placeholder="Nuova voce" enterkeyhint="done">
+  </form>
 </div>
 
 <script>
@@ -600,9 +590,12 @@
   }
 
   function filtraListePerRicerca(elencoListe, testo) {
-    const testoNormalizzato = testo.trim().toLowerCase();
-    if (testoNormalizzato === "") return elencoListe;
-    return elencoListe.filter(lista => lista.titolo.toLowerCase().includes(testoNormalizzato));
+    const parole = testo.trim().toLowerCase().split(/\s+/).filter(parola => parola !== "");
+    if (parole.length === 0) return elencoListe;
+    return elencoListe.filter(lista => {
+      const titoloNormalizzato = lista.titolo.toLowerCase();
+      return parole.every(parola => titoloNormalizzato.includes(parola));
+    });
   }
 
   function creaRigaLista(lista, progressivo) {
@@ -835,12 +828,13 @@
   }
 
   async function gestisciAggiuntaVoce(evento) {
-    if (evento.key !== "Enter") return;
-    const testo = evento.target.value;
+    evento.preventDefault();
+    const campo = document.getElementById("campo-nuova-voce");
+    const testo = campo.value;
     if (testo.trim() === "") return;
     await aggiungiVoce(listaApertaId, testo);
     aggiornaVistaDettaglio();
-    document.getElementById("campo-nuova-voce").focus();
+    campo.focus();
   }
 
   async function gestisciEliminaLista() {
@@ -924,7 +918,7 @@
   document.getElementById("pulsante-nuova-lista").addEventListener("click", gestisciNuovaLista);
   document.getElementById("pulsante-torna-elenco").addEventListener("click", gestisciRitornoElenco);
   document.getElementById("campo-titolo").addEventListener("change", gestisciModificaTitolo);
-  document.getElementById("campo-nuova-voce").addEventListener("keydown", gestisciAggiuntaVoce);
+  document.getElementById("form-nuova-voce").addEventListener("submit", gestisciAggiuntaVoce);
   document.getElementById("pulsante-elimina-lista").addEventListener("click", gestisciEliminaLista);
   document.getElementById("campo-ricerca").addEventListener("input", gestisciRicerca);
   document.getElementById("pulsante-esporta").addEventListener("click", gestisciEsportazione);
