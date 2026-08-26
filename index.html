@@ -5,24 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MyList</title>
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#FAF5E6">
+<meta name="theme-color" content="#FAF9F5">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MyList">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22%3E%3Crect width=%22192%22 height=%22192%22 rx=%2228%22 fill=%22%23fff6a8%22/%3E%3Ctext x=%2296%22 y=%22132%22 font-family=%22Courier New, monospace%22 font-size=%22120%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%231a1a1a%22%3EM%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22%3E%3Crect width=%22192%22 height=%22192%22 rx=%2228%22 fill=%22%233F5A44%22/%3E%3Ctext x=%2296%22 y=%22132%22 font-family=%22-apple-system, sans-serif%22 font-size=%22120%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%23FFFFFF%22%3EM%3C/text%3E%3C/svg%3E">
 <style>
   :root {
     --spazio-safe-top: env(safe-area-inset-top, 0px);
     --spazio-safe-bottom: env(safe-area-inset-bottom, 0px);
     --spazio-safe-left: env(safe-area-inset-left, 0px);
     --spazio-safe-right: env(safe-area-inset-right, 0px);
-    --colore-sfondo: #FAF5E6;
-    --colore-testo: #1a1a1a;
-    --colore-attenuato: #8a8a8a;
+    --colore-sfondo: #FAF9F5;
+    --colore-testo: #262624;
+    --colore-attenuato: #7A776F;
     --colore-accento: #2f6fed;
     --colore-pericolo: #d64545;
-    --colore-bordo: #ddd;
+    --colore-bordo: #E8E6DF;
     --colore-superficie: #ffffff;
+    --colore-intestazione-sezione-sfondo: #DDE7DC;
+    --colore-intestazione-sezione-testo: #3F5A44;
+    --colore-barra-traccia: #E5E3DB;
+    --colore-barra-riempimento: #3F5A44;
   }
 
   * {
@@ -39,7 +43,7 @@
   body {
     background: var(--colore-sfondo);
     color: var(--colore-testo);
-    font-family: "Courier New", Courier, monospace;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 16px;
   }
 
@@ -47,34 +51,12 @@
     position: relative;
     min-height: 100vh;
     max-width: 420px;
-    margin: calc(var(--spazio-safe-top) + 18px) auto 0;
-    padding-top: 26px;
+    margin: 0 auto;
+    padding-top: calc(var(--spazio-safe-top) + 16px);
     padding-bottom: calc(var(--spazio-safe-bottom) + 10px);
     padding-left: calc(var(--spazio-safe-left) + 10px);
     padding-right: calc(var(--spazio-safe-right) + 10px);
     background-color: var(--colore-sfondo);
-  }
-
-  .schermata-cornice {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
-  .schermata::before {
-    content: "";
-    position: absolute;
-    top: -13px;
-    left: 14px;
-    right: 14px;
-    height: 26px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 26'%3E%3Cpath d='M6 24c-3.5-1-4.6-8-3.6-13C3.4 6 6.6 2.3 10 2.6c3 .3 4.4 4 4 8.4-.3 3.6-2 6-4.6 6.2' fill='none' stroke='%235a5a5a' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: repeat-x;
-    background-size: 32px 26px;
-    background-position: 4px top;
-    z-index: 1;
   }
 
   .nascosta {
@@ -173,15 +155,7 @@
 
   .contenitore-ricerca {
     position: relative;
-    margin-bottom: 34px;
-  }
-
-  .ricerca-cornice {
-    position: absolute;
-    inset: 0;
-    overflow: visible;
-    pointer-events: none;
-    transform: translateY(-6.5px);
+    margin-bottom: 16px;
   }
 
   .contenitore-ricerca .icona-lente {
@@ -219,7 +193,7 @@
     padding: 8px 10px;
     background: var(--colore-superficie);
     border: 1px solid var(--colore-bordo);
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
   }
 
@@ -244,21 +218,14 @@
 
   .intestazione-titolo {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    flex-direction: column;
     margin-bottom: 10px;
   }
 
-  .etichetta-nota {
-    font-size: 18px;
-    font-weight: bold;
-    white-space: nowrap;
-  }
-
-  .giorno-settimana {
-    font-size: 18px;
-    font-weight: bold;
-    white-space: nowrap;
+  .sottotitolo-data {
+    margin: 2px 0 0 8px;
+    color: var(--colore-attenuato);
+    font-size: 14px;
   }
 
   .campo-titolo {
@@ -279,11 +246,56 @@
     background: var(--colore-superficie);
   }
 
+  .riepilogo-avanzamento {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--colore-attenuato);
+    margin-bottom: 6px;
+  }
+
+  .barra-avanzamento {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--colore-barra-traccia);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .barra-avanzamento-riempimento {
+    height: 100%;
+    background: var(--colore-barra-riempimento);
+  }
+
   .elenco-voci {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 16px;
     margin-bottom: 12px;
+  }
+
+  .sezione {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .intestazione-sezione {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    background: var(--colore-intestazione-sezione-sfondo);
+    color: var(--colore-intestazione-sezione-testo);
+  }
+
+  .sezione-voci {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .riga-voce {
@@ -294,7 +306,7 @@
     padding: 6px 10px;
     background: var(--colore-superficie);
     border: 1px solid var(--colore-bordo);
-    border-radius: 10px;
+    border-radius: 12px;
   }
 
   .riga-voce input[type="checkbox"] {
@@ -303,17 +315,57 @@
     flex-shrink: 0;
   }
 
-  .riga-voce .testo-voce {
+  .riga-voce .contenuto-voce {
     flex: 1;
+    min-width: 0;
+  }
+
+  .riga-voce .testo-voce {
+    display: block;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 500;
     word-break: break-word;
   }
 
+  .riga-voce .nota-voce {
+    display: block;
+    font-size: 13px;
+    color: var(--colore-attenuato);
+    word-break: break-word;
+    margin-top: 2px;
+  }
+
   .riga-voce.fatta .testo-voce {
-    font-weight: normal;
     text-decoration: line-through;
     color: var(--colore-attenuato);
+  }
+
+  .riga-voce.fatta .nota-voce {
+    text-decoration: line-through;
+  }
+
+  .campo-modifica-titolo,
+  .campo-modifica-nota {
+    display: block;
+    width: 100%;
+    font-family: inherit;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 8px;
+    background: var(--colore-superficie);
+    padding: 4px 6px;
+  }
+
+  .campo-modifica-titolo {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  .campo-modifica-nota {
+    font-size: 13px;
+    color: var(--colore-attenuato);
+    min-height: 32px;
+    resize: vertical;
   }
 
   .riga-voce .elimina-voce {
@@ -347,10 +399,8 @@
 
   .riga-voce.in-trascinamento {
     opacity: 0.9;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
     position: relative;
     z-index: 5;
-    transition: box-shadow 150ms ease;
   }
 
   .riga-voce.in-trascinamento .maniglia-trascina {
@@ -377,24 +427,7 @@
 </head>
 <body>
 
-<svg width="0" height="0" style="position: absolute" aria-hidden="true">
-  <defs>
-    <filter id="mano1" x="-8%" y="-8%" width="116%" height="116%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.028" numOctaves="3" seed="5" result="rumore1"></feTurbulence>
-      <feDisplacementMap in="SourceGraphic" in2="rumore1" scale="3.5" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
-    </filter>
-    <filter id="mano2" x="-8%" y="-8%" width="116%" height="116%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.016 0.033" numOctaves="2" seed="19" result="rumore2"></feTurbulence>
-      <feDisplacementMap in="SourceGraphic" in2="rumore2" scale="4" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
-    </filter>
-  </defs>
-</svg>
-
 <div id="schermata-elenco" class="schermata">
-  <svg class="schermata-cornice" viewBox="0 0 300 500" preserveAspectRatio="none" aria-hidden="true">
-    <rect x="7" y="7" width="286" height="486" rx="2" ry="2" fill="none" stroke="#5a5a5a" stroke-width="0.9" opacity="0.6" filter="url(#mano1)"></rect>
-    <rect x="5" y="5" width="290" height="490" rx="2" ry="2" fill="none" stroke="#5a5a5a" stroke-width="0.9" opacity="0.55" filter="url(#mano2)"></rect>
-  </svg>
   <div class="intestazione">
     <h1>MyList</h1>
     <div class="azioni-intestazione">
@@ -419,19 +452,11 @@
       <line x1="15.3" y1="15.3" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></line>
     </svg>
     <input id="campo-ricerca" class="campo-ricerca" type="text" placeholder="Cerca nelle note">
-    <svg class="ricerca-cornice" viewBox="0 0 300 44" preserveAspectRatio="none" aria-hidden="true">
-      <rect x="4" y="4" width="292" height="36" rx="6" ry="6" fill="none" stroke="#5a5a5a" stroke-width="1" opacity="0.65" filter="url(#mano1)"></rect>
-      <rect x="3" y="3" width="294" height="38" rx="6" ry="6" fill="none" stroke="#5a5a5a" stroke-width="1" opacity="0.55" filter="url(#mano2)"></rect>
-    </svg>
   </div>
   <div id="elenco-liste" class="elenco-liste"></div>
 </div>
 
 <div id="schermata-dettaglio" class="schermata nascosta">
-  <svg class="schermata-cornice" viewBox="0 0 300 500" preserveAspectRatio="none" aria-hidden="true">
-    <rect x="7" y="7" width="286" height="486" rx="2" ry="2" fill="none" stroke="#5a5a5a" stroke-width="0.9" opacity="0.6" filter="url(#mano1)"></rect>
-    <rect x="5" y="5" width="290" height="490" rx="2" ry="2" fill="none" stroke="#5a5a5a" stroke-width="0.9" opacity="0.55" filter="url(#mano2)"></rect>
-  </svg>
   <div class="intestazione">
     <button id="pulsante-torna-elenco" class="pulsante-secondario pulsante">&larr; Liste</button>
     <button id="pulsante-elimina-lista" class="pulsante-elimina-discreto" title="Elimina lista">
@@ -441,10 +466,14 @@
     </button>
   </div>
   <div class="intestazione-titolo">
-    <span class="etichetta-nota">Nota:</span>
-    <span id="giorno-settimana" class="giorno-settimana"></span>
     <input id="campo-titolo" class="campo-titolo" type="text">
+    <p id="sottotitolo-data" class="sottotitolo-data"></p>
   </div>
+  <div class="riepilogo-avanzamento">
+    <span>completate</span>
+    <span id="contatore-avanzamento"></span>
+  </div>
+  <div class="barra-avanzamento"><div id="barra-avanzamento-riempimento" class="barra-avanzamento-riempimento"></div></div>
   <div id="elenco-voci" class="elenco-voci"></div>
   <form id="form-nuova-voce" class="barra-nuova-voce">
     <input id="campo-nuova-voce" class="campo-nuova-voce" type="text" placeholder="Nuova voce" enterkeyhint="done">
@@ -457,6 +486,7 @@
   let listaApertaId = null;
   let testoRicerca = "";
   let dbPromise = null;
+  let voceInModificaId = null;
 
   function apriDatabase() {
     return new Promise((risolvi, rifiuta) => {
@@ -538,34 +568,9 @@
     return new Date().toISOString();
   }
 
-  function calcolaProgressiviDuplicati(elencoListe) {
-    const gruppi = {};
-    elencoListe.forEach(lista => {
-      const chiave = lista.titolo.trim().toLowerCase();
-      if (!gruppi[chiave]) gruppi[chiave] = [];
-      gruppi[chiave].push(lista);
-    });
-
-    const progressivi = {};
-    Object.values(gruppi).forEach(gruppo => {
-      if (gruppo.length < 2) return;
-      const ordinatoPerCreazione = [...gruppo].sort((a, b) => a.creata.localeCompare(b.creata));
-      ordinatoPerCreazione.forEach((lista, indice) => {
-        progressivi[lista.id] = indice + 1;
-      });
-    });
-
-    return progressivi;
-  }
-
-  function estraiGiornoSettimana(titolo) {
-    const corrispondenza = titolo.match(/^(\d{2})-(\d{2})-(\d{4})$/);
-    if (!corrispondenza) return null;
-    const [, giorno, mese, anno] = corrispondenza;
-    const data = new Date(`${anno}-${mese}-${giorno}T00:00:00`);
-    if (isNaN(data.getTime())) return null;
-    const nomiGiorni = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
-    return nomiGiorni[data.getDay()];
+  function formattaDataEstesa(dataISO) {
+    const data = new Date(`${dataISO}T00:00:00`);
+    return data.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
 
   function ottieniTutteLeListeVisibili() {
@@ -612,6 +617,19 @@
     await salva(lista);
   }
 
+  function otteniNota(voce) {
+    return voce.nota || "";
+  }
+
+  async function modificaVoce(listaId, voceId, nuovoTesto, nuovaNota) {
+    const lista = ottieniListaPerId(listaId);
+    const voce = lista.voci.find(v => v.id === voceId);
+    voce.testo = nuovoTesto.trim();
+    voce.nota = nuovaNota.trim();
+    lista.modificata = adessoISO();
+    await salva(lista);
+  }
+
   async function toggleVoce(listaId, voceId) {
     const lista = ottieniListaPerId(listaId);
     const voce = lista.voci.find(v => v.id === voceId);
@@ -628,9 +646,14 @@
   }
 
 
-  async function riordinaVociSecondoId(listaId, ordineId) {
+  async function riordinaVociSecondoId(listaId, ordineIdSezione) {
     const lista = ottieniListaPerId(listaId);
-    lista.voci.sort((a, b) => ordineId.indexOf(a.id) - ordineId.indexOf(b.id));
+    const mappaVoci = new Map(lista.voci.map(voce => [voce.id, voce]));
+    let indice = 0;
+    lista.voci = lista.voci.map(voce => {
+      if (!ordineIdSezione.includes(voce.id)) return voce;
+      return mappaVoci.get(ordineIdSezione[indice++]);
+    });
     lista.modificata = adessoISO();
     await salva(lista);
   }
@@ -658,15 +681,13 @@
     });
   }
 
-  function creaRigaLista(lista, progressivo) {
+  function creaRigaLista(lista) {
     const riga = document.createElement("div");
     riga.className = "riga-lista";
 
     const titolo = document.createElement("span");
     titolo.className = "titolo-riga";
-    const giorno = estraiGiornoSettimana(lista.titolo);
-    const suffissoProgressivo = progressivo ? ` (${progressivo})` : "";
-    titolo.textContent = "Nota: " + (giorno ? giorno + " " : "") + lista.titolo + suffissoProgressivo;
+    titolo.textContent = lista.titolo;
 
     const contatore = document.createElement("span");
     contatore.className = "contatore-riga";
@@ -680,6 +701,10 @@
   }
 
   function creaRigaVoce(lista, voce) {
+    if (voce.id === voceInModificaId) {
+      return creaRigaVoceModifica(lista, voce);
+    }
+
     const riga = document.createElement("div");
     riga.className = "riga-voce" + (voce.fatto ? " fatta" : "");
     riga.dataset.voceId = voce.id;
@@ -689,9 +714,22 @@
     casella.checked = voce.fatto;
     casella.addEventListener("change", () => gestisciToggleVoce(lista.id, voce.id, voce.fatto, casella));
 
+    const contenuto = document.createElement("div");
+    contenuto.className = "contenuto-voce";
+    contenuto.addEventListener("click", () => gestisciAperturaModificaVoce(voce.id));
+
     const testo = document.createElement("span");
     testo.className = "testo-voce";
     testo.textContent = voce.testo;
+    contenuto.appendChild(testo);
+
+    const nota = otteniNota(voce);
+    if (nota !== "") {
+      const rigaNota = document.createElement("span");
+      rigaNota.className = "nota-voce";
+      rigaNota.textContent = nota;
+      contenuto.appendChild(rigaNota);
+    }
 
     const maniglia = document.createElement("span");
     maniglia.className = "maniglia-trascina";
@@ -705,9 +743,94 @@
     pulsanteElimina.addEventListener("click", () => gestisciEliminaVoce(lista.id, voce.id));
 
     riga.appendChild(casella);
-    riga.appendChild(testo);
+    riga.appendChild(contenuto);
     riga.appendChild(maniglia);
     riga.appendChild(pulsanteElimina);
+
+    return riga;
+  }
+
+  function creaSezioneVoci(lista, nome, voci) {
+    const sezione = document.createElement("div");
+    sezione.className = "sezione";
+
+    const intestazione = document.createElement("div");
+    intestazione.className = "intestazione-sezione";
+    const etichetta = document.createElement("span");
+    etichetta.textContent = nome;
+    const conteggio = document.createElement("span");
+    conteggio.textContent = voci.length;
+    intestazione.appendChild(etichetta);
+    intestazione.appendChild(conteggio);
+
+    const contenitoreRighe = document.createElement("div");
+    contenitoreRighe.className = "sezione-voci";
+    voci.forEach(voce => contenitoreRighe.appendChild(creaRigaVoce(lista, voce)));
+
+    sezione.appendChild(intestazione);
+    sezione.appendChild(contenitoreRighe);
+    return sezione;
+  }
+
+  function gestisciAperturaModificaVoce(voceId) {
+    voceInModificaId = voceId;
+    aggiornaVistaDettaglio();
+  }
+
+  function creaRigaVoceModifica(lista, voce) {
+    const riga = document.createElement("div");
+    riga.className = "riga-voce in-modifica" + (voce.fatto ? " fatta" : "");
+    riga.dataset.voceId = voce.id;
+
+    const casella = document.createElement("input");
+    casella.type = "checkbox";
+    casella.checked = voce.fatto;
+    casella.addEventListener("change", () => gestisciToggleVoce(lista.id, voce.id, voce.fatto, casella));
+
+    const contenuto = document.createElement("div");
+    contenuto.className = "contenuto-voce";
+
+    const campoTitolo = document.createElement("input");
+    campoTitolo.type = "text";
+    campoTitolo.className = "campo-modifica-titolo";
+    campoTitolo.value = voce.testo;
+
+    const campoNota = document.createElement("textarea");
+    campoNota.className = "campo-modifica-nota";
+    campoNota.value = otteniNota(voce);
+    campoNota.rows = 1;
+    campoNota.placeholder = "Nota (facoltativa)";
+
+    contenuto.appendChild(campoTitolo);
+    contenuto.appendChild(campoNota);
+
+    riga.appendChild(casella);
+    riga.appendChild(contenuto);
+
+    const chiudiESalva = async () => {
+      if (voceInModificaId !== voce.id) return;
+      voceInModificaId = null;
+      if (campoTitolo.value.trim() === "") {
+        aggiornaVistaDettaglio();
+        return;
+      }
+      await modificaVoce(lista.id, voce.id, campoTitolo.value, campoNota.value);
+      aggiornaVistaDettaglio();
+    };
+
+    riga.addEventListener("focusout", evento => {
+      if (riga.contains(evento.relatedTarget)) return;
+      chiudiESalva();
+    });
+
+    campoTitolo.addEventListener("keydown", evento => {
+      if (evento.key === "Enter") {
+        evento.preventDefault();
+        campoNota.focus();
+      }
+    });
+
+    requestAnimationFrame(() => campoTitolo.focus());
 
     return riga;
   }
@@ -731,9 +854,8 @@
       return;
     }
 
-    const progressivi = calcolaProgressiviDuplicati(listeVisibili);
     listeVisibili.forEach(lista => {
-      contenitore.appendChild(creaRigaLista(lista, progressivi[lista.id]));
+      contenitore.appendChild(creaRigaLista(lista));
     });
   }
 
@@ -743,12 +865,24 @@
     const campoTitolo = document.getElementById("campo-titolo");
     campoTitolo.value = lista.titolo;
 
-    const giorno = estraiGiornoSettimana(lista.titolo);
-    document.getElementById("giorno-settimana").textContent = giorno ? giorno : "";
+    document.getElementById("sottotitolo-data").textContent = formattaDataEstesa(lista.data);
+
+    const fatte = lista.voci.filter(v => v.fatto).length;
+    const totale = lista.voci.length;
+    document.getElementById("contatore-avanzamento").textContent = `${fatte} / ${totale}`;
+    const percentuale = totale === 0 ? 0 : (fatte / totale) * 100;
+    document.getElementById("barra-avanzamento-riempimento").style.width = `${percentuale}%`;
 
     const contenitoreVoci = document.getElementById("elenco-voci");
     contenitoreVoci.innerHTML = "";
-    lista.voci.forEach(voce => contenitoreVoci.appendChild(creaRigaVoce(lista, voce)));
+    const daFare = lista.voci.filter(voce => !voce.fatto);
+    const eseguiti = lista.voci.filter(voce => voce.fatto);
+    if (daFare.length > 0) {
+      contenitoreVoci.appendChild(creaSezioneVoci(lista, "Task da effettuare", daFare));
+    }
+    if (eseguiti.length > 0) {
+      contenitoreVoci.appendChild(creaSezioneVoci(lista, "Task già eseguiti", eseguiti));
+    }
 
     document.getElementById("campo-nuova-voce").value = "";
   }
@@ -756,18 +890,21 @@
   async function gestisciNuovaLista() {
     const nuovaLista = await creaNuovaLista();
     listaApertaId = nuovaLista.id;
+    voceInModificaId = null;
     aggiornaVistaDettaglio();
     mostraSchermata("dettaglio");
   }
 
   function gestisciAperturaLista(id) {
     listaApertaId = id;
+    voceInModificaId = null;
     aggiornaVistaDettaglio();
     mostraSchermata("dettaglio");
   }
 
   function gestisciRitornoElenco() {
     listaApertaId = null;
+    voceInModificaId = null;
     aggiornaVistaElenco();
     mostraSchermata("elenco");
   }
@@ -864,7 +1001,7 @@
     const vicino = trovaVicinoDaScambiare(centroTrascinata);
     if (!vicino) return;
 
-    const contenitore = document.getElementById("elenco-voci");
+    const contenitore = elementoTrascinato.parentElement;
     const posizioniPrima = catturaPosizioniVerticali(contenitore);
     const offsetTopPrima = elementoTrascinato.offsetTop;
 
@@ -884,9 +1021,9 @@
 
     elementoTrascinato.classList.remove("in-trascinamento");
     elementoTrascinato.style.transform = "";
-    const contenitore = document.getElementById("elenco-voci");
-    const nuovoOrdineId = Array.from(contenitore.children).map(elemento => elemento.dataset.voceId);
-    riordinaVociSecondoId(listaIdTrascinata, nuovoOrdineId);
+    const contenitore = elementoTrascinato.parentElement;
+    const nuovoOrdineIdSezione = Array.from(contenitore.children).map(elemento => elemento.dataset.voceId);
+    riordinaVociSecondoId(listaIdTrascinata, nuovoOrdineIdSezione);
 
     elementoTrascinato = null;
     listaIdTrascinata = null;
