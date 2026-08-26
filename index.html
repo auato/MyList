@@ -19,6 +19,7 @@
     --colore-sfondo: #FAF9F5;
     --colore-testo: #262624;
     --colore-attenuato: #7A776F;
+    --colore-nota: #827F77;
     --colore-accento: #2f6fed;
     --colore-pericolo: #d64545;
     --colore-bordo: #E8E6DF;
@@ -278,7 +279,10 @@
   .sezione {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    border: 1px solid var(--colore-bordo);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--colore-superficie);
   }
 
   .intestazione-sezione {
@@ -286,7 +290,6 @@
     align-items: center;
     justify-content: space-between;
     padding: 6px 10px;
-    border-radius: 8px;
     font-weight: bold;
     background: var(--colore-intestazione-sezione-sfondo);
     color: var(--colore-intestazione-sezione-testo);
@@ -295,7 +298,6 @@
   .sezione-voci {
     display: flex;
     flex-direction: column;
-    gap: 6px;
   }
 
   .riga-voce {
@@ -305,8 +307,11 @@
     min-height: 44px;
     padding: 6px 10px;
     background: var(--colore-superficie);
-    border: 1px solid var(--colore-bordo);
-    border-radius: 12px;
+    border-top: 1px solid var(--colore-bordo);
+  }
+
+  .sezione-voci .riga-voce:first-child {
+    border-top: none;
   }
 
   .riga-voce input[type="checkbox"] {
@@ -330,7 +335,7 @@
   .riga-voce .nota-voce {
     display: block;
     font-size: 13px;
-    color: var(--colore-attenuato);
+    color: var(--colore-nota);
     word-break: break-word;
     margin-top: 2px;
   }
@@ -362,8 +367,9 @@
   }
 
   .campo-modifica-nota {
-    font-size: 13px;
-    color: var(--colore-attenuato);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--colore-nota);
     min-height: 32px;
     resize: vertical;
   }
@@ -409,18 +415,35 @@
 
   .barra-nuova-voce {
     display: flex;
-    gap: 8px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px;
     margin-bottom: 16px;
-  }
-
-  .campo-nuova-voce {
-    flex: 1;
-    min-height: 44px;
-    padding: 0 12px;
-    font-size: 16px;
     border: 1px solid var(--colore-bordo);
     border-radius: 10px;
     background: var(--colore-superficie);
+  }
+
+  .campo-nuova-voce {
+    min-height: 40px;
+    padding: 4px 2px;
+    font-size: 16px;
+    font-family: inherit;
+    border: none;
+    background: transparent;
+  }
+
+  .campo-nuova-nota {
+    display: block;
+    width: 100%;
+    min-height: 32px;
+    padding: 4px 2px;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--colore-nota);
+    border: none;
+    background: transparent;
+    resize: vertical;
   }
 
 </style>
@@ -477,6 +500,7 @@
   <div id="elenco-voci" class="elenco-voci"></div>
   <form id="form-nuova-voce" class="barra-nuova-voce">
     <input id="campo-nuova-voce" class="campo-nuova-voce" type="text" placeholder="Nuova voce" enterkeyhint="done">
+    <textarea id="campo-nuova-nota" class="campo-nuova-nota" placeholder="Nota (facoltativa)" rows="1" enterkeyhint="done"></textarea>
   </form>
 </div>
 
@@ -610,9 +634,13 @@
     await salva(lista);
   }
 
-  async function aggiungiVoce(listaId, testo) {
+  async function aggiungiVoce(listaId, testo, nota) {
     const lista = ottieniListaPerId(listaId);
-    lista.voci.push({ id: generaId(), testo: testo.trim(), fatto: false });
+    const nuovaVoce = { id: generaId(), testo: testo.trim(), fatto: false };
+    if (nota && nota.trim() !== "") {
+      nuovaVoce.nota = nota.trim();
+    }
+    lista.voci.push(nuovaVoce);
     lista.modificata = adessoISO();
     await salva(lista);
   }
@@ -885,6 +913,7 @@
     }
 
     document.getElementById("campo-nuova-voce").value = "";
+    document.getElementById("campo-nuova-nota").value = "";
   }
 
   async function gestisciNuovaLista() {
@@ -1035,9 +1064,10 @@
   async function gestisciAggiuntaVoce(evento) {
     evento.preventDefault();
     const campo = document.getElementById("campo-nuova-voce");
+    const campoNota = document.getElementById("campo-nuova-nota");
     const testo = campo.value;
     if (testo.trim() === "") return;
-    await aggiungiVoce(listaApertaId, testo);
+    await aggiungiVoce(listaApertaId, testo, campoNota.value);
     aggiornaVistaDettaglio();
     campo.focus();
   }
@@ -1124,6 +1154,12 @@
   document.getElementById("pulsante-torna-elenco").addEventListener("click", gestisciRitornoElenco);
   document.getElementById("campo-titolo").addEventListener("change", gestisciModificaTitolo);
   document.getElementById("form-nuova-voce").addEventListener("submit", gestisciAggiuntaVoce);
+  document.getElementById("campo-nuova-nota").addEventListener("keydown", evento => {
+    if (evento.key === "Enter" && !evento.shiftKey) {
+      evento.preventDefault();
+      document.getElementById("form-nuova-voce").requestSubmit();
+    }
+  });
   document.getElementById("pulsante-elimina-lista").addEventListener("click", gestisciEliminaLista);
   document.getElementById("campo-ricerca").addEventListener("input", gestisciRicerca);
   document.getElementById("pulsante-esporta").addEventListener("click", gestisciEsportazione);
