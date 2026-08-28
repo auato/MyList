@@ -585,7 +585,10 @@
 
   function formattaTitoloData(dataISO) {
     const [anno, mese, giorno] = dataISO.split("-");
-    return `${giorno}-${mese}-${anno}`;
+    const dataBreve = `${giorno}-${mese}-${anno}`;
+    const data = new Date(`${dataISO}T00:00:00`);
+    const giornoSettimana = data.toLocaleDateString('it-IT', { weekday: 'long' }).toLowerCase();
+    return `${giornoSettimana} ${dataBreve}`;
   }
 
   function adessoISO() {
