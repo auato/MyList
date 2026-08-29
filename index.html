@@ -597,7 +597,7 @@
 
   function formattaDataEstesa(dataISO) {
     const data = new Date(`${dataISO}T00:00:00`);
-    return data.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+    return data.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }
 
   function ottieniTutteLeListeVisibili() {
